@@ -96,19 +96,19 @@ public class ApplicationContext {
 
     private void putBeanIfAnnotatedAsComponent(String className) {
         try {
-            Class<?> classInstance = Class.forName(className);
-            boolean isAnnotatedAsComponent = classInstance.isAnnotationPresent(Component.class);
+            Class<?> clazz = Class.forName(className);
+            boolean isAnnotatedAsComponent = clazz.isAnnotationPresent(Component.class);
             if (isAnnotatedAsComponent) {
-                putAnnotatedClassInstanceAsBean(className, classInstance);
+                putAnnotatedClassInstanceAsBean(className, clazz);
             }
         } catch (ClassNotFoundException e) {
             throw new ComponentScanException(ErrorMessage.CLASS_NOT_FOUND.getMessage(className), e);
         }
     };
 
-    private void putAnnotatedClassInstanceAsBean(String className, Class<?> classInstance) {
+    private void putAnnotatedClassInstanceAsBean(String className, Class<?> clazz) {
         try {
-            Constructor<?> constructor = classInstance.getConstructor(null);
+            Constructor<?> constructor = clazz.getConstructor(null);
             beans.put(className, constructor.newInstance());
         } catch (NoSuchMethodException e) {
             throw new BeanCreationException(ErrorMessage.NO_DEFAULT_CONSTRUCTOR.getMessage(className), e);
