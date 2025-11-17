@@ -18,13 +18,17 @@
 
 ### 2. IoC 컨테이너 구현
 - 컴포넌트 스캔 및 인스턴스 생성
-    - [ ] **ApplicationContext (컨테이너) 클래스 정의**
+    - [x] **ApplicationContext (컨테이너) 클래스 정의**
         - `Map`을 사용한 **빈 저장소(Singleton Registry)** 구현
-    - [ ] **컴포넌트 스캔 및 빈 생성**
+    - [x] **컴포넌트 스캔 및 빈 생성**
         - 특정 패키지 하위의 `@Component` 어노테이션이 붙은 클래스 스캔
+        - **(예외 처리)** 패키지 스캔 실패 시 예외 발생
+          - 스캔 중 I/O 오류가 발생할 경우: `ComponentScanException`
+          - 클래스를 찾지 못할 경우: `ComponentScanException`
         - Reflection API를 사용해 스캔한 클래스들의 인스턴스 생성
         - **(예외 처리)** 빈 생성 실패 시 예외 발생
-            - `@Component`로 등록된 클래스에 기본 생성자가 없는 경우
+            - `@Component`로 등록된 클래스에 기본 생성자가 없는 경우: `BeanCreationException`
+            - 추상 클래스 등 인스턴스화가 불가능한 경우: `BeanCreationException`
         - 생성된 인스턴스를 빈 저장소에 등록
 - 의존성 주입
     - [ ] **의존성 주입 (Dependency Injection)**
@@ -35,9 +39,9 @@
             - `@Component`가 누락된 경우
             - `@Autowired`로 주입하려는 타입의 빈이 2개 이상 발견되어 유일성이 보장되지 않는 경우
         - Reflection API를 사용해 필드에 의존 객체를 **주입**
-    - [ ] **외부에서 컨테이너의 빈 조회**
+    - [x] **외부에서 컨테이너의 빈 조회**
         - `getBean()` 메서드를 통해 등록된 빈 반환
-        - **(예외 처리)** 빈 저장소에 해당 타입의 빈이 존재하지 않을 경우 예외 발생
+        - **(예외 처리)** 빈 저장소에 해당 타입의 빈이 존재하지 않을 경우 예외 발생: `NoSuchBeanException`
 
 ### 3. (선택 과제) 기능 추가
 - [ ] 생성자 주입 방식 지원
