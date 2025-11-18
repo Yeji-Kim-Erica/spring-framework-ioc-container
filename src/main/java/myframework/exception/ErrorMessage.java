@@ -11,7 +11,10 @@ public enum ErrorMessage {
 
     // NoSuchBeanException
     BEAN_NOT_FOUND("%s의 빈이 존재하지 않습니다."),
-    BEAN_TYPE_NOT_MATCHED("해당 이름을 가진 해당 타입의 빈이 존재하지 않습니다. (실제 타입: %s)");
+    BEAN_TYPE_NOT_MATCHED("'%s'라는 이름의 %s 타입 빈이 존재하지 않습니다. (실제 타입: %s)"),
+
+    // DependencyInjectionException
+    DEPENDENCY_INJECTION_FAILED("%s 클래스의 '%s' 필드 의존성 주입에 실패했습니다.");
 
     private final String message;
 
@@ -20,6 +23,10 @@ public enum ErrorMessage {
     }
 
     public String getMessage(String cause) {
+        return String.format(message, cause);
+    }
+
+    public String getMessage(Object... cause) {
         return String.format(message, cause);
     }
 }

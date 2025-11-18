@@ -1,8 +1,11 @@
 package myframework.container;
 
 import myframework.exception.BeanCreationException;
+import myframework.exception.DependencyInjectionException;
 import myframework.exception.NoSuchBeanException;
+import myframework.test.fakepackage.FakeAutowiredComponent;
 import myframework.test.fakepackage.FakeComponent;
+import myframework.test.fakepackage.FakeComponentWithInheritance;
 import myframework.test.fakepackage.fakesubpackage.FakeSubComponent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -57,6 +60,36 @@ public class ApplicationContextTest {
             assertThat(context.getBean(componentName, FakeComponent.class)).isNotNull()
                     .isInstanceOf(FakeComponent.class);
         }
+
+        @DisplayName("Autowired 어노테이션으로 빈 저장소의 해당 클래스 빈을 주입받는다.")
+        @Test
+        void injectBeanFromBeanRegistry_WhenAnnotatedAsAutowired() {
+            // given
+            String componentName = BASE_PACKAGE + ".FakeComponent";
+            String autowiredComponentName = BASE_PACKAGE + ".FakeAutowiredComponent";
+
+            // when
+            FakeComponent component = context.getBean(componentName, FakeComponent.class);
+
+            // then
+            assertThat(component).extracting("autowiredComponent").isNotNull()
+                    .isEqualTo(context.getBean(autowiredComponentName, FakeAutowiredComponent.class));
+        }
+
+        @DisplayName("상속받은 필드에도 빈을 주입받는다.")
+        @Test
+        void injectBeanForInheritedField() {
+            // given
+            String componentName = BASE_PACKAGE + ".FakeComponentWithInheritance";
+            String autowiredComponentName = BASE_PACKAGE + ".FakeAutowiredComponent";
+
+            // when
+            FakeComponentWithInheritance component = context.getBean(componentName, FakeComponentWithInheritance.class);
+
+            // then
+            assertThat(component).extracting("autowiredComponent").isNotNull()
+                    .isEqualTo(context.getBean(autowiredComponentName, FakeAutowiredComponent.class));
+        }
     }
 
     @Nested
@@ -109,6 +142,17 @@ public class ApplicationContextTest {
             assertThatThrownBy(() -> context.getBean(componentName, String.class))
                     .isInstanceOf(NoSuchBeanException.class)
                     .hasMessageContaining("FakeComponent");
+        }
+
+        @DisplayName("Autowired 대상인 빈이 존재하지 않으면(Component 누락) 예외가 발생한다")
+        @Test
+        void throwException_WhenAutowiredBeanMissing() {
+            // given
+            String errorPackage = "myframework.test.failpackage.missingdependency";
+
+            // when & then
+            assertThatThrownBy(() -> new ApplicationContext(errorPackage))
+                    .isInstanceOf(NoSuchBeanException.class);
         }
     }
 }
