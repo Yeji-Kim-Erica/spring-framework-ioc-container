@@ -4,7 +4,7 @@ import myframework.annotation.Autowired;
 import myframework.annotation.Component;
 
 @Component
-public class FakeComponent {
+public class FakeComponentWithAbstractField {
     @Autowired
-    FakeAutowiredComponent autowiredComponent;
+    FakeAbstract fakeAbstract;
 }

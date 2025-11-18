@@ -1,14 +1,14 @@
 package myframework.container;
 
+import com.sun.jdi.ClassType;
+import myframework.annotation.Autowired;
 import myframework.annotation.Component;
-import myframework.exception.BeanCreationException;
-import myframework.exception.ComponentScanException;
-import myframework.exception.ErrorMessage;
-import myframework.exception.NoSuchBeanException;
+import myframework.exception.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.*;
@@ -25,7 +25,8 @@ public class ApplicationContext {
     public ApplicationContext(String basePackage) {
         this.BASE_PACKAGE = basePackage;
         this.beans = new ConcurrentHashMap<>();
-        scanCandidateComponents();
+        Set<String> initiatedComponents = scanCandidateComponentsAndInstantiate();
+        injectDependencies(initiatedComponents);
     }
 
     public Object getBean(String beanName) {
@@ -36,11 +37,26 @@ public class ApplicationContext {
         return bean;
     }
 
-    private void scanCandidateComponents() {
-        Set<String> classNames = getClassNamesFromPackage(BASE_PACKAGE);
-        for (String className : classNames) {
-            putBeanIfAnnotatedAsComponent(className);
+    public <T> T getBean(String beanName, Class<T> classType) {
+        Object bean = getBean(beanName);
+        if (classType.isInstance(bean)) {
+            return classType.cast(bean);
         }
+        String expected = classType.getName();
+        String found = bean.getClass().getName();
+        throw new NoSuchBeanException(ErrorMessage.BEAN_TYPE_NOT_MATCHED.getMessage(beanName, expected, found));
+    }
+
+    private Set<String> scanCandidateComponentsAndInstantiate() {
+        Set<String> classNames = getClassNamesFromPackage(BASE_PACKAGE);
+        Set<String> initiatedComponents = new HashSet<>();
+        for (String className : classNames) {
+            boolean isAnnotated = putBeanIfAnnotatedAsComponent(className);
+            if (isAnnotated) {
+                initiatedComponents.add(className);
+            }
+        }
+        return initiatedComponents;
     }
 
     private Set<String> getClassNamesFromPackage(String basePackage) {
@@ -94,13 +110,15 @@ public class ApplicationContext {
         }
     }
 
-    private void putBeanIfAnnotatedAsComponent(String className) {
+    private boolean putBeanIfAnnotatedAsComponent(String className) {
         try {
             Class<?> clazz = Class.forName(className);
             boolean isAnnotatedAsComponent = clazz.isAnnotationPresent(Component.class);
             if (isAnnotatedAsComponent) {
                 putAnnotatedClassInstanceAsBean(className, clazz);
+                return true;
             }
+            return false;
         } catch (ClassNotFoundException e) {
             throw new ComponentScanException(ErrorMessage.CLASS_NOT_FOUND.getMessage(className), e);
         }
@@ -115,5 +133,59 @@ public class ApplicationContext {
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new BeanCreationException(ErrorMessage.BEAN_INSTANTIATION_FAILED.getMessage(className), e);
         }
+    }
+
+    private void injectDependencies(Set<String> initiatedComponents) {
+        for (String componentName : initiatedComponents) {
+            Object bean = getBean(componentName);
+            Class<?> clazz = bean.getClass();
+            while(clazz != null && clazz != Object.class) {
+                injectDependenciesIfAnnotatedAsAutowired(bean, clazz);
+                clazz = clazz.getSuperclass();
+            }
+        }
+    }
+
+    private void injectDependenciesIfAnnotatedAsAutowired(Object bean, Class<?> clazz) {
+        for (Field field : clazz.getDeclaredFields()) {
+            if (field.isAnnotationPresent(Autowired.class)) {
+                injectDependency(bean, field);
+            }
+        }
+    }
+
+    private void injectDependency(Object bean, Field field) {
+        field.setAccessible(true);
+        try {
+            field.set(bean, findDependencyBean(field));
+        } catch (IllegalAccessException e) {
+            String beanClassName = bean.getClass().getName();
+            throw new DependencyInjectionException(
+                    ErrorMessage.DEPENDENCY_INJECTION_FAILED.getMessage(beanClassName, field.getName()), e);
+        }
+    }
+
+    private Object findDependencyBean(Field field) {
+        try {
+            return getBean(field.getType().getName());
+        } catch (NoSuchBeanException e) {
+            return findBeanByType(field);
+        }
+    }
+
+    private Object findBeanByType(Field field) {
+        List<Object> candidateBeans = new ArrayList<>();
+        for (Object bean : beans.values()) {
+            if (field.getType().isInstance(bean)) {
+                candidateBeans.add(bean);
+            }
+        }
+        if (candidateBeans.isEmpty()) {
+            throw new DependencyInjectionException(ErrorMessage.DEPENDENCY_BEAN_NOT_FOUND.getMessage(field.getName()));
+        }
+        if (candidateBeans.size() > 1) {
+            throw new DependencyInjectionException(ErrorMessage.TOO_MANY_DEPENDENCY_BEANS.getMessage(field.getName()));
+        }
+        return candidateBeans.getFirst();
     }
 }
