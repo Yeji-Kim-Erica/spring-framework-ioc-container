@@ -36,6 +36,14 @@ public class ApplicationContext {
         return bean;
     }
 
+    public <T> T getBean(String beanName, Class<T> classType) {
+        Object bean = getBean(beanName);
+        if (classType.isInstance(bean)) {
+            return classType.cast(bean);
+        }
+        throw new NoSuchBeanException(ErrorMessage.BEAN_TYPE_NOT_MATCHED.getMessage(bean.getClass().getName()));
+    }
+
     private void scanCandidateComponents() {
         Set<String> classNames = getClassNamesFromPackage(BASE_PACKAGE);
         for (String className : classNames) {

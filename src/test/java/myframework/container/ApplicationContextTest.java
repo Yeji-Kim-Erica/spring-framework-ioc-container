@@ -46,6 +46,17 @@ public class ApplicationContextTest {
                     .isNotNull()
                     .isInstanceOf(FakeSubComponent.class);
         }
+
+        @DisplayName("빈 이름과 타입을 함께 제공하면 캐스팅된 빈을 반환한다")
+        @Test
+        void returnCastedBeanForBeanWithTypeName() {
+            // given
+            String componentName = BASE_PACKAGE + ".FakeComponent";
+
+            // when & then
+            assertThat(context.getBean(componentName, FakeComponent.class)).isNotNull()
+                    .isInstanceOf(FakeComponent.class);
+        }
     }
 
     @Nested
@@ -86,6 +97,18 @@ public class ApplicationContextTest {
             assertThatThrownBy(() -> new ApplicationContext(errorPackage))
                     .isInstanceOf(BeanCreationException.class)
                     .hasCauseInstanceOf(InstantiationException.class);
+        }
+
+        @DisplayName("빈의 이름은 존재하지만 요청한 타입과 다를 경우 예외가 발생한다")
+        @Test
+        void throwException_WhenTypeMismatch() {
+            // given
+            String componentName = BASE_PACKAGE + ".FakeComponent";
+
+            // when & then
+            assertThatThrownBy(() -> context.getBean(componentName, String.class))
+                    .isInstanceOf(NoSuchBeanException.class)
+                    .hasMessageContaining("FakeComponent");
         }
     }
 }
