@@ -3,9 +3,7 @@ package myframework.container;
 import myframework.exception.BeanCreationException;
 import myframework.exception.DependencyInjectionException;
 import myframework.exception.NoSuchBeanException;
-import myframework.test.fakepackage.FakeAutowiredComponent;
-import myframework.test.fakepackage.FakeComponent;
-import myframework.test.fakepackage.FakeComponentWithInheritance;
+import myframework.test.fakepackage.*;
 import myframework.test.fakepackage.fakesubpackage.FakeSubComponent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -61,7 +59,7 @@ public class ApplicationContextTest {
                     .isInstanceOf(FakeComponent.class);
         }
 
-        @DisplayName("Autowired 어노테이션으로 빈 저장소의 해당 클래스 빈을 주입받는다.")
+        @DisplayName("Autowired 어노테이션으로 빈 저장소의 해당 클래스 빈을 주입받는다")
         @Test
         void injectBeanFromBeanRegistry_WhenAnnotatedAsAutowired() {
             // given
@@ -76,7 +74,7 @@ public class ApplicationContextTest {
                     .isEqualTo(context.getBean(autowiredComponentName, FakeAutowiredComponent.class));
         }
 
-        @DisplayName("상속받은 필드에도 빈을 주입받는다.")
+        @DisplayName("상속받은 필드에도 빈을 주입받는다")
         @Test
         void injectBeanForInheritedField() {
             // given
@@ -89,6 +87,37 @@ public class ApplicationContextTest {
             // then
             assertThat(component).extracting("autowiredComponent").isNotNull()
                     .isEqualTo(context.getBean(autowiredComponentName, FakeAutowiredComponent.class));
+        }
+        
+        @DisplayName("Autowired 어노테이션이 붙은 필드가 인터페이스일 경우 해당 인터페이스의 구현체를 주입받는다")
+        @Test
+        void injectBeanWithImplementedClassInstance_WhenAutowiredFieldIsInterface() {
+            // given
+            String componentName = BASE_PACKAGE + ".FakeComponentWithInterfaceField";
+            String autowiredComponentName = BASE_PACKAGE + ".FakeImplementation";
+
+            // when
+            FakeComponentWithInterfaceField component =
+                    context.getBean(componentName, FakeComponentWithInterfaceField.class);
+
+            // then
+            assertThat(component).extracting("fakeInterface").isNotNull()
+                    .isEqualTo(context.getBean(autowiredComponentName, FakeImplementation.class));
+        }
+
+        @DisplayName("Autowired 어노테이션이 붙은 필드가 추상 클래스일 경우 해당 클래스의 자식 빈을 주입받는다")
+        @Test
+        void injectBeanWithSubClassInstance_WhenAutowiredFieldIsAbstractClass() {
+            // given
+            String componentName = BASE_PACKAGE + ".FakeComponentWithAbstractField";
+            String autowiredComponentName = BASE_PACKAGE + ".FakeConcreteComponent";
+
+            // when
+            Object component = context.getBean(componentName);
+
+            // then
+            assertThat(component).extracting("fakeAbstract").isNotNull()
+                    .isEqualTo(context.getBean(autowiredComponentName, FakeConcreteComponent.class));
         }
     }
 
@@ -152,7 +181,18 @@ public class ApplicationContextTest {
 
             // when & then
             assertThatThrownBy(() -> new ApplicationContext(errorPackage))
-                    .isInstanceOf(NoSuchBeanException.class);
+                    .isInstanceOf(DependencyInjectionException.class);
+        }
+
+        @DisplayName("Autowired로 주입하려는 타입의 빈이 2개 이상 발견되어 유일성이 보장되지 않는 경우 예외가 발생한다")
+        @Test
+        void throwException_WhenMoreThanOneAutowiredBeansFound() {
+            // given
+            String errorPackage = EXCEPTION_TEST_BASE_PACKAGE + ".nouniquebean";
+
+            // when & then
+            assertThatThrownBy(() -> new ApplicationContext(errorPackage))
+                    .isInstanceOf(DependencyInjectionException.class);
         }
     }
 }

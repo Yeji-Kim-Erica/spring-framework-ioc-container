@@ -1,5 +1,6 @@
 package myframework.container;
 
+import com.sun.jdi.ClassType;
 import myframework.annotation.Autowired;
 import myframework.annotation.Component;
 import myframework.exception.*;
@@ -156,11 +157,35 @@ public class ApplicationContext {
     private void injectDependency(Object bean, Field field) {
         field.setAccessible(true);
         try {
-            field.set(bean, getBean(field.getType().getName(), field.getType()));
+            field.set(bean, findDependencyBean(field));
         } catch (IllegalAccessException e) {
             String beanClassName = bean.getClass().getName();
             throw new DependencyInjectionException(
                     ErrorMessage.DEPENDENCY_INJECTION_FAILED.getMessage(beanClassName, field.getName()), e);
         }
+    }
+
+    private Object findDependencyBean(Field field) {
+        try {
+            return getBean(field.getType().getName());
+        } catch (NoSuchBeanException e) {
+            return findBeanByType(field);
+        }
+    }
+
+    private Object findBeanByType(Field field) {
+        List<Object> candidateBeans = new ArrayList<>();
+        for (Object bean : beans.values()) {
+            if (field.getType().isInstance(bean)) {
+                candidateBeans.add(bean);
+            }
+        }
+        if (candidateBeans.isEmpty()) {
+            throw new DependencyInjectionException(ErrorMessage.DEPENDENCY_BEAN_NOT_FOUND.getMessage(field.getName()));
+        }
+        if (candidateBeans.size() > 1) {
+            throw new DependencyInjectionException(ErrorMessage.TOO_MANY_DEPENDENCY_BEANS.getMessage(field.getName()));
+        }
+        return candidateBeans.getFirst();
     }
 }

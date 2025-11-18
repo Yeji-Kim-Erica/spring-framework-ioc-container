@@ -31,13 +31,13 @@
             - 추상 클래스 등 인스턴스화가 불가능한 경우: `BeanCreationException`
         - 생성된 인스턴스를 빈 저장소에 등록
 - 의존성 주입
-    - [ ] **의존성 주입 (Dependency Injection)**
+    - [x] **의존성 주입 (Dependency Injection)**
         - 빈 저장소에 등록된 객체들을 순회
         - `@Autowired` 어노테이션이 붙은 필드 식별
         - 빈 저장소에서 해당 필드 타입에 맞는 빈을 **조회**
         - **(예외 처리)** 주입할 빈을 찾지 못할 경우 예외 발생
-            - [x] `@Component`가 누락된 경우: `NoSuchBeanException`
-            - [ ] `@Autowired`로 주입하려는 타입의 빈이 2개 이상 발견되어 유일성이 보장되지 않는 경우
+            - [x] `@Component`가 누락된 경우: `DependencyInjectionException`
+            - [x] `@Autowired`로 주입하려는 타입의 빈의 유일성이 보장되지 않는 경우: `DependencyInjectionException`
         - Reflection API를 사용해 필드에 의존 객체를 **주입**
     - [x] **컨테이너의 빈 조회**
         - 컨테이너에 등록된 빈 반환

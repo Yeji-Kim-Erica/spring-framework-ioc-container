@@ -14,7 +14,9 @@ public enum ErrorMessage {
     BEAN_TYPE_NOT_MATCHED("'%s'라는 이름의 %s 타입 빈이 존재하지 않습니다. (실제 타입: %s)"),
 
     // DependencyInjectionException
-    DEPENDENCY_INJECTION_FAILED("%s 클래스의 '%s' 필드 의존성 주입에 실패했습니다.");
+    DEPENDENCY_INJECTION_FAILED("%s 클래스의 '%s' 필드 의존성 주입에 실패했습니다."),
+    DEPENDENCY_BEAN_NOT_FOUND("'%s' 필드에 주입될 수 있는 빈이 존재하지 않습니다."),
+    TOO_MANY_DEPENDENCY_BEANS("'%s' 필드에 주입될 수 있는 빈이 유일하지 않습니다.");
 
     private final String message;
 
