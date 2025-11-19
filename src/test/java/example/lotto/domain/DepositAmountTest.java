@@ -14,6 +14,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class DepositAmountTest {
+    private static final int LOTTO_PRICE = 1000;
+
     @Nested
     class SuccessTest {
         @DisplayName("구입 금액으로 구매 가능한 로또의 개수를 반환한다.")
@@ -22,7 +24,7 @@ public class DepositAmountTest {
         void should_ReturnNumberOfAffordableLotto(String input, int expected) {
             // when
             DepositAmount depositAmount = DepositAmount.from(input);
-            int numberOfPurchasableLotto = depositAmount.getNumberOfPurchasableLotto();
+            int numberOfPurchasableLotto = depositAmount.getNumberOfPurchasableLotto(LOTTO_PRICE);
 
             // then
             assertThat(numberOfPurchasableLotto).isEqualTo(expected);

@@ -72,7 +72,7 @@ src/main/java
 
 - [x] **기존 프로젝트 코드 이식**
     - 기존 로또 프로젝트의 코드를 `example.lotto` 패키지로 분리하여 이식
-- [ ] **IoC 컨테이너 기반 리팩토링**
+- [x] **IoC 컨테이너 기반 리팩토링**
     - 직접 객체를 생성(`new`)하고 주입하던 코드 제거
     - `@Component`, `@Autowired`를 적용하여 **제어의 역전(IoC)** 적용
     - `ApplicationContext`를 통한 애플리케이션 실행 및 정상 동작 확인

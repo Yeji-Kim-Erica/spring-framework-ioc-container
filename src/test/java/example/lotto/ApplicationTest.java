@@ -1,6 +1,11 @@
 package example.lotto;
 
 import camp.nextstep.edu.missionutils.test.NsTest;
+import example.lotto.controller.LottoController;
+import example.lotto.service.DrawService;
+import example.lotto.service.PurchaseService;
+import myframework.container.ApplicationContext;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -11,6 +16,34 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ApplicationTest extends NsTest {
     private static final String ERROR_MESSAGE = "[ERROR]";
+
+    @DisplayName("프레임워크가 모든 의존성을 정상적으로 조립한다")
+    @Test
+    void contextLoads() {
+        // given
+        ApplicationContext context = new ApplicationContext("example.lotto");
+
+        // when
+        LottoController controller =
+                context.getBean("example.lotto.controller.LottoController", LottoController.class);
+        PurchaseService purchaseService =
+                context.getBean("example.lotto.service.PurchaseService", PurchaseService.class);
+        DrawService drawService =
+                context.getBean("example.lotto.service.DrawService", DrawService.class);
+
+        // then
+        assertThat(controller).isNotNull();
+        assertThat(controller).extracting("purchaseService").isNotNull()
+                .isEqualTo(purchaseService);
+        assertThat(controller).extracting("drawService").isNotNull()
+                .isEqualTo(drawService);
+
+        assertThat(purchaseService).isNotNull();
+        assertThat(purchaseService).extracting("lottoNumberGenerator").isNotNull()
+                        .isEqualTo(context.getBean("example.lotto.util.RandomLottoNumberGenerator"));
+
+        assertThat(drawService).isNotNull();
+    }
 
     @Test
     void 기능_테스트() {

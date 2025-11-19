@@ -58,12 +58,11 @@ public final class OutputView {
     public static void printWinningResults(Prizes prizes) {
         System.out.println();
         System.out.println(WINNING_RESULTS_INITIAL_LINE);
-        for (Entry<Prize, Integer> entry : prizes.getPrizesCountEntries()) {
-            Prize prize = entry.getKey();
-            int count = entry.getValue();
-            if (prize != Prize.NONE) {
-                printWinningResult(prize, count);
-            }
+        for (Prize prize : Prize.values()) {
+            if (prize == Prize.NONE) continue;
+
+            int count = prizes.getPrizesCount(prize);
+            printWinningResult(prize, count);
         }
     }
 

@@ -5,18 +5,18 @@ import example.lotto.service.DrawService;
 import example.lotto.service.PurchaseService;
 import example.lotto.view.InputView;
 import example.lotto.view.OutputView;
+import myframework.annotation.Autowired;
+import myframework.annotation.Component;
 
 /**
  * 로또 발매기 프로그램의 전체 흐름을 담당하는 클래스
  */
+@Component
 public class LottoController {
-    private final PurchaseService purchaseService;
-    private final DrawService drawService;
-
-    public LottoController(PurchaseService purchaseService, DrawService drawService) {
-        this.purchaseService = purchaseService;
-        this.drawService = drawService;
-    }
+    @Autowired
+    private PurchaseService purchaseService;
+    @Autowired
+    private DrawService drawService;
 
     public void run() {
         DepositAmount depositAmount = makeDeposit();

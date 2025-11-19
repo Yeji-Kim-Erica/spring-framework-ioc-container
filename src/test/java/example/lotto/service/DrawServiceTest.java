@@ -60,53 +60,39 @@ public class DrawServiceTest {
         @Test
         void should_CreatePrizes() {
             // given
-            LottoNumberGenerator lottoNumberGenerator = new LottoNumberGenerator() {
-                @Override
-                public List<Integer> generateUniqueNumbersInRange() {
-                    return List.of(1,2,3,4,5,6);
-                }
-            };
-            Lottos lottos = Lottos.issue(3, lottoNumberGenerator);
+            Lottos lottos = new Lottos(List.of(
+                    new Lotto(List.of(1,2,3,4,5,6)),
+                    new Lotto(List.of(1,2,3,4,5,7)),
+                    new Lotto(List.of(1,2,3,4,5,8)),
+                    new Lotto(List.of(1,7,8,9,10,11))
+            ));
             WinningNumbers winningNumbers = WinningNumbers.from("1,2,3,4,5,6");
             BonusNumber bonusNumber = BonusNumber.of("7", winningNumbers);
 
             // when
             Prizes prizes = drawService.checkLotteryResult(lottos, winningNumbers, bonusNumber);
-            Set<Entry<Prize, Integer>> result = prizes.getPrizesCountEntries();
 
             // then
-            assertThat(result)
-                    .containsExactlyInAnyOrder(
-                            entry(Prize.FIRST_PRIZE, 3),
-                            entry(Prize.SECOND_PRIZE, 0),
-                            entry(Prize.THIRD_PRIZE, 0),
-                            entry(Prize.FOURTH_PRIZE, 0),
-                            entry(Prize.FIFTH_PRIZE, 0),
-                            entry(Prize.NONE, 0)
-                    );
+            assertThat(prizes.getPrizesCount(Prize.FIRST_PRIZE)).isEqualTo(1);
+            assertThat(prizes.getPrizesCount(Prize.SECOND_PRIZE)).isEqualTo(1);
+            assertThat(prizes.getPrizesCount(Prize.THIRD_PRIZE)).isEqualTo(1);
+            assertThat(prizes.getPrizesCount(Prize.FOURTH_PRIZE)).isEqualTo(0);
+            assertThat(prizes.getPrizesCount(Prize.FIFTH_PRIZE)).isEqualTo(0);
+            assertThat(prizes.getPrizesCount(Prize.NONE)).isEqualTo(1);
         }
 
         @DisplayName("구입 금액 대비 로또 당첨 결과 수익률을 반환한다.")
-        @ParameterizedTest(name = "{0}원 입금, {3}% 수익률")
-        @CsvSource(value = {"13000:1,2,3,7,8,9:10:500.0", "1000:1,2,3,4,5,7:8:150000.0"}, delimiter = ':')
-        void should_ReturnProfitRate(String deposit, String winningNum, String bonusNum, double expected) {
+        @Test
+        void should_ReturnProfitRate() {
             // given
-            DepositAmount depositAmount = DepositAmount.from(deposit);
-            int purchasedAmount = depositAmount.getNumberOfPurchasableLotto();
-            LottoNumberGenerator lottoNumberGenerator = new LottoNumberGenerator() {
-                @Override
-                public List<Integer> generateUniqueNumbersInRange() {
-                    return List.of(1,2,3,4,5,6);
-                }
-            };
-            Lottos lottos = Lottos.issue(purchasedAmount, lottoNumberGenerator);
-            WinningNumbers winningNumbers = WinningNumbers.from(winningNum);
-            BonusNumber bonusNumber = BonusNumber.of(bonusNum, winningNumbers);
-            Prizes prizes = Prizes.of(lottos, winningNumbers, bonusNumber);
+            DepositAmount depositAmount = DepositAmount.from("8000");
+            Prizes prizes = Prizes.from(
+                    List.of(Prize.FIFTH_PRIZE)
+            );
 
             // when & then
             assertThat(drawService.calculateProfitRate(depositAmount, prizes))
-                    .isEqualTo(expected);
+                    .isEqualTo(62.5);
         }
     }
 

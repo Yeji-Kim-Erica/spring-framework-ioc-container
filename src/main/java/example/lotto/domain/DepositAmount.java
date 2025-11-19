@@ -10,8 +10,8 @@ import example.lotto.util.InputParser;
  * 구입금액 domain 클래스
  */
 public class DepositAmount {
-    private static final int LOTTO_PRICE = 1000;
-    private static final int MAXIMUM_AMOUNT = Math.floorDiv(Integer.MAX_VALUE, LOTTO_PRICE) * LOTTO_PRICE;
+    private static final int DEPOSIT_UNIT = 1000;
+    private static final int MAXIMUM_AMOUNT = Math.floorDiv(Integer.MAX_VALUE, DEPOSIT_UNIT) * DEPOSIT_UNIT;
 
     private final int amount;
 
@@ -26,8 +26,8 @@ public class DepositAmount {
         return new DepositAmount(parsedAmount);
     }
 
-    public int getNumberOfPurchasableLotto() {
-        return amount / LOTTO_PRICE;
+    public int getNumberOfPurchasableLotto(int lottoPrice) {
+        return amount / lottoPrice;
     }
 
     public double divideProfitByExpense(long totalWinningAmount) {
@@ -41,7 +41,7 @@ public class DepositAmount {
     }
 
     private void validateDepositExceedsMinimum(int amount) {
-        boolean isLessThanMinimum = amount < LOTTO_PRICE;
+        boolean isLessThanMinimum = amount < DEPOSIT_UNIT;
         if (isLessThanMinimum) {
             throw new IllegalArgumentException(ErrorMessage.DEPOSIT_AMOUNT_LESS_THAN_MINIMUM.getMessage());
         }
@@ -55,7 +55,7 @@ public class DepositAmount {
     }
 
     private void validateDepositDivisibleByLottoPrice(int amount) {
-        boolean isNotDivisibleByLottoPrice = (amount % LOTTO_PRICE != 0);
+        boolean isNotDivisibleByLottoPrice = (amount % DEPOSIT_UNIT != 0);
         if (isNotDivisibleByLottoPrice) {
             throw new IllegalArgumentException(ErrorMessage.DEPOSIT_AMOUNT_NOT_DIVISIBLE_BY_LOTTO_PRICE.getMessage());
         }

@@ -1,7 +1,5 @@
 package example.lotto.domain;
 
-import example.lotto.util.LottoNumberGenerator;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,17 +10,8 @@ import java.util.List;
 public class Lottos {
     private final List<Lotto> lottos;
 
-    private Lottos(List<Lotto> lottos) {
+    public Lottos(List<Lotto> lottos) {
         this.lottos = lottos;
-    }
-
-    public static Lottos issue(int quantity, LottoNumberGenerator lottoNumberGenerator) {
-        List<Lotto> lottos = new ArrayList<>(quantity);
-        for (int i = 1; i <= quantity; i++) {
-            Lotto lotto = generateLotto(lottoNumberGenerator);
-            lottos.add(lotto);
-        }
-        return new Lottos(lottos);
     }
 
     public List<Lotto> getLottos() {
@@ -33,8 +22,14 @@ public class Lottos {
         return lottos.size();
     }
 
-    private static Lotto generateLotto(LottoNumberGenerator lottoNumberGenerator) {
-        List<Integer> lottoNumbers = lottoNumberGenerator.generateUniqueNumbersInRange();
-        return new Lotto(lottoNumbers);
+    public List<Prize> getPrizeResults(WinningNumbers winningNumbers, BonusNumber bonusNumber) {
+        List<Prize> prizes = new ArrayList<>();
+        for (Lotto lotto : lottos) {
+            int winningNumbersMatchCount = lotto.countMatchingWinningNumbers(winningNumbers);
+            boolean hasMatchingBonusNumber = lotto.hasMatchingBonusNumber(bonusNumber);
+            Prize prize = Prize.of(winningNumbersMatchCount, hasMatchingBonusNumber);
+            prizes.add(prize);
+        }
+        return prizes;
     }
 }

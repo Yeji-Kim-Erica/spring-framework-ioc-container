@@ -1,34 +1,28 @@
 package example.lotto.domain;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * 로또 당첨 결과 목록을 관리하는 일급 컬렉션 클래스
  */
 public class Prizes {
-    private final Map<Prize, Integer> prizesCount;
+    private final EnumMap<Prize, Integer> prizesCount;
 
-    private Prizes(Map<Prize, Integer> prizesCount) {
+    private Prizes(EnumMap<Prize, Integer> prizesCount) {
         this.prizesCount = prizesCount;
     }
 
-    public static Prizes of(Lottos lottos, WinningNumbers winningNumbers, BonusNumber bonusNumber) {
-        Map<Prize, Integer> prizes = initializePrizes();
-        for (Lotto lotto : lottos.getLottos()) {
-            int winningNumbersMatchCount = lotto.countMatchingWinningNumbers(winningNumbers);
-            boolean hasMatchingBonusNumber = lotto.hasMatchingBonusNumber(bonusNumber);
-            Prize prize = Prize.of(winningNumbersMatchCount, hasMatchingBonusNumber);
-            prizes.put(prize, prizes.get(prize) + 1);
+    public static Prizes from(List<Prize> prizes) {
+        EnumMap<Prize, Integer> prizesCount = new EnumMap<>(Prize.class);
+        for (Prize prize : prizes) {
+            prizesCount.merge(prize, 1, Integer::sum);
         }
-        return new Prizes(prizes);
+        return new Prizes(prizesCount);
     }
 
-    public Set<Entry<Prize, Integer>> getPrizesCountEntries() {
-        return Collections.unmodifiableSet(prizesCount.entrySet());
+    public int getPrizesCount(Prize prize) {
+        return prizesCount.getOrDefault(prize, 0);
     }
 
     public long calculateTotalWinningAmount() {
@@ -39,13 +33,5 @@ public class Prizes {
             sum += (long) prize.getWinningsAmount() * count;
         }
         return sum;
-    }
-
-    private static Map<Prize, Integer> initializePrizes() {
-        Map<Prize, Integer> map = new LinkedHashMap<>();
-        for (Prize prize : Prize.values()) {
-            map.put(prize, 0);
-        }
-        return map;
     }
 }

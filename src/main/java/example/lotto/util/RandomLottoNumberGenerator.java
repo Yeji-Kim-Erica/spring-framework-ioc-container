@@ -1,12 +1,14 @@
 package example.lotto.util;
 
 import camp.nextstep.edu.missionutils.Randoms;
+import myframework.annotation.Component;
 
 import java.util.List;
 
 /**
  * 난수 목록을 생성하는 클래스
  */
+@Component
 public class RandomLottoNumberGenerator implements LottoNumberGenerator {
     private static final int START_RANGE_NUMBER = 1;
     private static final int END_RANGE_NUMBER = 45;

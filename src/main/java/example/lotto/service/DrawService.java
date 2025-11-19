@@ -1,10 +1,15 @@
 package example.lotto.service;
 
 import example.lotto.domain.*;
+import myframework.annotation.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 당첨 처리 관련 로직을 담당하는 클래스
  */
+@Component
 public class DrawService {
     private static final int RATE_TO_PERCENTAGE = 100;
 
@@ -17,7 +22,8 @@ public class DrawService {
     }
 
     public Prizes checkLotteryResult(Lottos lottos, WinningNumbers winningNumbers, BonusNumber bonusNumber) {
-        return Prizes.of(lottos, winningNumbers, bonusNumber);
+        List<Prize> prizes = lottos.getPrizeResults(winningNumbers, bonusNumber);
+        return Prizes.from(prizes);
     }
 
     public double calculateProfitRate(DepositAmount depositAmount, Prizes prizes) {

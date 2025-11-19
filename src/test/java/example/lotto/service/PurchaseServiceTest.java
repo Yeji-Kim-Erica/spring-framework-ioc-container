@@ -2,13 +2,16 @@ package example.lotto.service;
 
 import example.lotto.domain.DepositAmount;
 import example.lotto.domain.Lottos;
-import example.lotto.service.PurchaseService;
+import myframework.support.TestUtils;
+import example.lotto.util.LottoNumberGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -19,12 +22,19 @@ public class PurchaseServiceTest {
     @BeforeEach
     void setUp() {
         purchaseService = new PurchaseService();
+        LottoNumberGenerator lottoNumberGenerator = new LottoNumberGenerator() {
+            @Override
+            public List<Integer> generateUniqueNumbersInRange() {
+                return List.of(1,2,3,4,5,6);
+            }
+        };
+        TestUtils.inject(purchaseService, "lottoNumberGenerator", lottoNumberGenerator);
     }
 
     @Nested
     class SuccessTest {
         @Test
-        @DisplayName("유효한 금액 입력 시 DepositAmount 객체를 생성하고 로또 개수를 반환한다.")
+        @DisplayName("유효한 금액 입력 시 DepositAmount 객체를 생성한다.")
         void depositMoney_ShouldReturnCorrectLottoCount() {
             // given
             String input = "5000";
@@ -33,7 +43,7 @@ public class PurchaseServiceTest {
             DepositAmount result = purchaseService.depositMoney(input);
 
             // then
-            assertThat(result.getNumberOfPurchasableLotto()).isEqualTo(5);
+            assertThat(result).isNotNull();
         }
 
         @Test
