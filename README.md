@@ -67,11 +67,12 @@ src/main/java
 ## 🧩 실전 적용 및 검증
 > **Package:** `example.lotto`
 
-직접 구현한 프레임워크의 동작을 검증하기 위해, 기존 우테코 프리코스 3주차 미션 [**로또(java-lotto-8)**](https://github.com/Yeji-Kim-Erica/java-lotto-8/tree/Yeji-Kim-Erica) 프로젝트를 이식해 실행합니다.
+직접 구현한 프레임워크의 동작을 검증하기 위해,  
+기존 우테코 프리코스 3주차 미션 [**로또(java-lotto-8)**](https://github.com/Yeji-Kim-Erica/java-lotto-8/tree/Yeji-Kim-Erica) 프로젝트를 이식해 실행합니다.
 
-- [ ] **기존 프로젝트 코드 이식**
+- [x] **기존 프로젝트 코드 이식**
     - 기존 로또 프로젝트의 코드를 `example.lotto` 패키지로 분리하여 이식
-- [ ] **IoC 컨테이너 기반 리팩토링**
+- [x] **IoC 컨테이너 기반 리팩토링**
     - 직접 객체를 생성(`new`)하고 주입하던 코드 제거
     - `@Component`, `@Autowired`를 적용하여 **제어의 역전(IoC)** 적용
     - `ApplicationContext`를 통한 애플리케이션 실행 및 정상 동작 확인
@@ -84,5 +85,3 @@ src/main/java
 - **Static 메서드 기반 유틸리티 접근 방식**과
 - **Singleton Registry 기반 객체 관리 방식**을 비교 실험하여  
   DI의 확장성과 테스트 용이성 측면에서 어떤 차이가 있는지를 검증합니다.
-
----

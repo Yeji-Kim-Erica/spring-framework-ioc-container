@@ -1,6 +1,5 @@
 package myframework.container;
 
-import com.sun.jdi.ClassType;
 import myframework.annotation.Autowired;
 import myframework.annotation.Component;
 import myframework.exception.*;
@@ -72,7 +71,7 @@ public class ApplicationContext {
     }
 
     private Set<String> getClassNamesFromResources(Enumeration<URL> resources) {
-        List<File> files = new ArrayList<File>();
+        List<File> files = new ArrayList<>();
         while (resources.hasMoreElements()) {
             URL resource = resources.nextElement();
             files.add(new File(resource.getFile()));

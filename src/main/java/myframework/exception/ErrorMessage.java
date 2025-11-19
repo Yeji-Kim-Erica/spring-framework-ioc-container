@@ -16,16 +16,15 @@ public enum ErrorMessage {
     // DependencyInjectionException
     DEPENDENCY_INJECTION_FAILED("%s 클래스의 '%s' 필드 의존성 주입에 실패했습니다."),
     DEPENDENCY_BEAN_NOT_FOUND("'%s' 필드에 주입될 수 있는 빈이 존재하지 않습니다."),
-    TOO_MANY_DEPENDENCY_BEANS("'%s' 필드에 주입될 수 있는 빈이 유일하지 않습니다.");
+    TOO_MANY_DEPENDENCY_BEANS("'%s' 필드에 주입될 수 있는 빈이 유일하지 않습니다."),
+
+    // TestDependencyInjectionException
+    TEST_FIELD_INJECTION_FAILED("테스트 도중 '%s' 필드 주입에 실패했습니다.");
 
     private final String message;
 
     ErrorMessage(String message) {
         this.message = message;
-    }
-
-    public String getMessage(String cause) {
-        return String.format(message, cause);
     }
 
     public String getMessage(Object... cause) {
