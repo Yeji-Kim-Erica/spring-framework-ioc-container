@@ -5,12 +5,25 @@
 
 ## 🎯 프로젝트 개요
 **Spring의 IoC 컨테이너 구조를 직접 구현**하며 **의존성 주입(DI)** 원리를 이해하고,  
-**Static 메서드 기반 접근 방식과 IoC 컨테이너의 Singleton Registry 관리 방식의 차이점 비교**를 통해
+**Static 메서드 기반 접근 방식과 IoC 컨테이너의 Singleton Registry 관리 방식의 차이점 비교**를 통해  
 적합한 설계에 대한 결론을 도출하기 위한 프로젝트입니다.
 
 ---
 
-## 📝 구현 기능 목록
+## 📂 프로젝트 구조
+이 프로젝트는 **프레임워크 구현체**와 **실제 사용 예시**, **비교 실험**을 패키지로 분리하여 구성했습니다.  
+```text
+src/main/java
+├── myframework → 직접 구현한 IoC 컨테이너
+├── example     → 프레임워크를 검증하기 위한 예제
+│   └── lotto   → 로또 미션 이식
+└── experiment  → Static vs Singleton 비교 실험
+```
+
+---
+
+## 🛠️ 프레임워크 구현
+> **Package:** `myframework`
 
 ### 1. 어노테이션 기반 설정 정보 정의
 - [x] `@Component`: 컴포넌트 스캔 대상을 식별하는 어노테이션 정의
@@ -30,8 +43,8 @@
             - `@Component`로 등록된 클래스에 기본 생성자가 없는 경우: `BeanCreationException`
             - 추상 클래스 등 인스턴스화가 불가능한 경우: `BeanCreationException`
         - 생성된 인스턴스를 빈 저장소에 등록
-- 의존성 주입
-    - [x] **의존성 주입 (Dependency Injection)**
+- 의존성 주입 (Dependency Injection)
+    - [x] **의존성 주입**
         - 빈 저장소에 등록된 객체들을 순회
         - `@Autowired` 어노테이션이 붙은 필드 식별
         - 빈 저장소에서 해당 필드 타입에 맞는 빈을 **조회**
@@ -51,23 +64,25 @@
 
 ---
 
-## 🔬 실험 계획
-IoC 컨테이너 구현을 완료한 이후,
+## 🧩 실전 적용 및 검증
+> **Package:** `example.lotto`
+
+직접 구현한 프레임워크의 동작을 검증하기 위해, 기존 우테코 프리코스 3주차 미션 [**로또(java-lotto-8)**](https://github.com/Yeji-Kim-Erica/java-lotto-8/tree/Yeji-Kim-Erica) 프로젝트를 이식해 실행합니다.
+
+- [ ] **기존 프로젝트 코드 이식**
+    - 기존 로또 프로젝트의 코드를 `example.lotto` 패키지로 분리하여 이식
+- [ ] **IoC 컨테이너 기반 리팩토링**
+    - 직접 객체를 생성(`new`)하고 주입하던 코드 제거
+    - `@Component`, `@Autowired`를 적용하여 **제어의 역전(IoC)** 적용
+    - `ApplicationContext`를 통한 애플리케이션 실행 및 정상 동작 확인
+
+---
+
+## 🔬 실험
+> **Package:** `experiment`
+
 - **Static 메서드 기반 유틸리티 접근 방식**과
 - **Singleton Registry 기반 객체 관리 방식**을 비교 실험하여  
-  DI의 확장성과 테스트 용이성 측면에서 어떤 차이가 있는지를 검증할 예정입니다.
-
-> 📁 실험 코드는 추후 [`experiments/`](./experiments/) 디렉토리에 정리될 예정입니다.
+  DI의 확장성과 테스트 용이성 측면에서 어떤 차이가 있는지를 검증합니다.
 
 ---
-
-## 🧩 학습 포인트
-- Reflection API를 활용한 런타임 의존성 주입
-- Singleton Registry 설계 원리
-- Static 메서드와 싱글톤 인스턴스의 사용 시점 비교
-- Spring DI의 내부 동작 원리 체험
-
----
-
-이번 미션을 통해 **스프링 DI의 핵심 구조를 직접 구현**하고,  
-**Static vs Singleton의 설계 선택 기준**을 명확히 이해하는 것을 목표로 합니다.
