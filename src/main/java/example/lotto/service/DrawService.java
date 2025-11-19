@@ -3,7 +3,6 @@ package example.lotto.service;
 import example.lotto.domain.*;
 import myframework.annotation.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

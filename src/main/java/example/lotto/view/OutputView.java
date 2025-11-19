@@ -6,7 +6,6 @@ import example.lotto.domain.Prize;
 import example.lotto.domain.Prizes;
 
 import java.text.DecimalFormat;
-import java.util.Map.Entry;
 
 /**
  * 프로그램의 모든 출력을 담당하는 클래스

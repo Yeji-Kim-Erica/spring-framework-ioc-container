@@ -4,7 +4,6 @@ import example.lotto.domain.DepositAmount;
 import example.lotto.domain.Lotto;
 import example.lotto.domain.Lottos;
 import example.lotto.util.LottoNumberGenerator;
-import example.lotto.util.RandomLottoNumberGenerator;
 import myframework.annotation.Autowired;
 import myframework.annotation.Component;
 
