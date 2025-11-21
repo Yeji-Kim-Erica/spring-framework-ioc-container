@@ -1,22 +1,12 @@
 package example.lotto.view;
 
-import camp.nextstep.edu.missionutils.Console;
-
 /**
- * 프로그램의 모든 입력을 담당하는 클래스
+ * 프로그램의 모든 입력을 담당하는 인터페이스
  */
-public final class InputView {
-    private InputView() {}
+public interface InputView {
+    String readDepositAmount();
 
-    public static String readDepositAmount() {
-        return Console.readLine();
-    }
+    String readWinningNumbers();
 
-    public static String readWinningNumbers() {
-        return Console.readLine();
-    }
-
-    public static String readBonusNumber() {
-        return Console.readLine();
-    }
+    String readBonusNumber();
 }

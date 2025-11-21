@@ -15,7 +15,7 @@ import java.util.List;
  */
 @Component
 public class PurchaseService {
-    private static int LOTTO_PRICE = 1000;
+    private static final int LOTTO_PRICE = 1000;
 
     private final LottoNumberGenerator lottoNumberGenerator;
 

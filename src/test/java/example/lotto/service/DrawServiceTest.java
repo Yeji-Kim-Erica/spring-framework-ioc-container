@@ -1,23 +1,17 @@
 package example.lotto.service;
 
 import example.lotto.domain.*;
-import example.lotto.service.DrawService;
-import example.lotto.util.LottoNumberGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.entry;
 
 public class DrawServiceTest {
     private DrawService drawService;
@@ -29,7 +23,7 @@ public class DrawServiceTest {
 
     @Nested
     class SuccessTest {
-        @DisplayName("유효한 당첨 번호 입력 시 WinningNumbers 객체를 생성한다.")
+        @DisplayName("유효한 당첨 번호 입력 시 입력한 값을 당첨 번호로 가지는 WinningNumbers 객체를 생성한다.")
         @Test
         void should_CreateWinningNumbers_ForValidInput() {
             // given
@@ -42,7 +36,7 @@ public class DrawServiceTest {
             assertThat(result.countMatchingNumbers(List.of(1,2,3,4,5,6))).isEqualTo(6);
         }
 
-        @DisplayName("유효한 보너스 번호 입력 시 BonusNumber 객체를 생성한다.")
+        @DisplayName("유효한 보너스 번호 입력 시 입력한 값을 보너스 번호로 가지는 BonusNumber 객체를 생성한다.")
         @Test
         void should_CreateBonusNumber_ForValidInput() {
             // given

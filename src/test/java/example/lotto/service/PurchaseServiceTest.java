@@ -2,16 +2,14 @@ package example.lotto.service;
 
 import example.lotto.domain.DepositAmount;
 import example.lotto.domain.Lottos;
-import myframework.support.TestUtils;
 import example.lotto.util.LottoNumberGenerator;
+import example.lotto.util.RandomLottoNumberGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -21,42 +19,36 @@ public class PurchaseServiceTest {
 
     @BeforeEach
     void setUp() {
-
-        LottoNumberGenerator lottoNumberGenerator = new LottoNumberGenerator() {
-            @Override
-            public List<Integer> generateUniqueNumbersInRange() {
-                return List.of(1,2,3,4,5,6);
-            }
-        };
+        LottoNumberGenerator lottoNumberGenerator = new RandomLottoNumberGenerator();
         purchaseService = new PurchaseService(lottoNumberGenerator);
     }
 
     @Nested
     class SuccessTest {
-        @Test
-        @DisplayName("유효한 금액 입력 시 DepositAmount 객체를 생성한다.")
-        void depositMoney_ShouldReturnCorrectLottoCount() {
-            // given
-            String input = "5000";
-
+        @DisplayName("유효한 금액 입력 시 입력한 금액만큼을 잔고로 가진 DepositAmount 객체를 생성한다.")
+        @ParameterizedTest(name = "{0}원 입금, 로또 가격 {1}원: 로또 {2}장 구매 가능")
+        @CsvSource(value = {"5000, 1000, 5", "10000, 1000, 10", "3000, 3000, 1"})
+        void should_CreateDepositAmountOfCorrectDeposit(String input, int lottoPrice, int expected) {
             // when
             DepositAmount result = purchaseService.depositMoney(input);
 
             // then
             assertThat(result).isNotNull();
+            assertThat(result.getNumberOfPurchasableLotto(lottoPrice)).isEqualTo(expected);
         }
 
-        @Test
-        @DisplayName("유효한 금액으로 구매 요청 시 올바른 수량의 Lottos 객체를 반환한다.")
-        void should_ReturnCorrectQuantity() {
+        @DisplayName("유효한 금액으로 구매 요청 시 올바른 수량의 Lotto를 가진 Lottos 객체를 생성한다.")
+        @ParameterizedTest(name = "{0}원 입금 시 로또 {1}장 발행")
+        @CsvSource(value = {"5000, 5", "10000, 10", "3000, 3"})
+        void should_CreateCorrectAmountOfLottos(String input, int expected) {
             // given
-            DepositAmount amount = DepositAmount.from("5000");
+            DepositAmount amount = DepositAmount.from(input);
 
             // when
             Lottos result = purchaseService.purchaseLottos(amount);
 
             // then
-            assertThat(result.size()).isEqualTo(5);
+            assertThat(result.size()).isEqualTo(expected);
         }
     }
 
