@@ -1,4 +1,4 @@
-package myframework.test.failpackage.missingdependency;
+package myframework.test.failpackage.missingdependencyfield;
 
 import myframework.annotation.Autowired;
 import myframework.annotation.Component;

@@ -4,10 +4,13 @@ public enum ErrorMessage {
     // ComponentScanException
     PACKAGE_SCAN_FAILED("패키지 '%s' 스캔에 실패했습니다."),
     CLASS_NOT_FOUND("%s라는 이름의 클래스가 존재하지 않습니다."),
+    COMPONENT_ON_NONCONCRETE("%s에는 Component를 붙일 수 없습니다."),
 
     // BeanCreationException
     NO_DEFAULT_CONSTRUCTOR("%s 클래스에 기본 생성자가 존재하지 않습니다."),
     BEAN_INSTANTIATION_FAILED("%s 클래스의 빈 생성에 실패했습니다."),
+    TOO_MANY_AUTOWIRED_CONSTRUCTOR("%s 클래스의 Autowired 생성자가 유일하지 않습니다."),
+    DEPENDENCY_BEAN_NOT_FOUND("'%s' 필드에 주입될 수 있는 빈이 존재하지 않습니다."),
 
     // NoSuchBeanException
     BEAN_NOT_FOUND("%s의 빈이 존재하지 않습니다."),
@@ -15,8 +18,8 @@ public enum ErrorMessage {
 
     // DependencyInjectionException
     DEPENDENCY_INJECTION_FAILED("%s 클래스의 '%s' 필드 의존성 주입에 실패했습니다."),
-    DEPENDENCY_BEAN_NOT_FOUND("'%s' 필드에 주입될 수 있는 빈이 존재하지 않습니다."),
     TOO_MANY_DEPENDENCY_BEANS("'%s' 필드에 주입될 수 있는 빈이 유일하지 않습니다."),
+    CIRCULAR_DEPENDENCY("%s 클래스에 순환 참조가 존재합니다."),
 
     // TestDependencyInjectionException
     TEST_FIELD_INJECTION_FAILED("테스트 도중 '%s' 필드 주입에 실패했습니다.");
