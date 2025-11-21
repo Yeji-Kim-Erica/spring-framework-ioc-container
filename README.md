@@ -14,10 +14,12 @@
 이 프로젝트는 **프레임워크 구현체**와 **실제 사용 예시**, **비교 실험**을 패키지로 분리하여 구성했습니다.  
 ```text
 src/main/java
-├── myframework → 직접 구현한 IoC 컨테이너
-├── example     → 프레임워크를 검증하기 위한 예제
-│   └── lotto   → 로또 미션 이식
-└── experiment  → Static vs Singleton 비교 실험
+├── myframework     → 직접 구현한 IoC 컨테이너
+├── example         → 프레임워크 검증 예제, 실험에서 Singleton을 대표
+│   └── lotto       → 로또 미션 이식: Singleton Registry 기반 DI 컨테이너 사용하도록 리팩토링
+└── experiment      → Static vs Singleton 비교 실험
+    └── statics     → 실험에서 Static을 대표
+        └── lotto   → 로또 미션 이식: Static 메서드 기반 유틸리티 클래스로 리팩토링
 ```
 
 ---
@@ -96,7 +98,7 @@ src/main/java
 실제 코드를 작성하고 테스트하는 과정에서 발생하는 **구조적 차이**와 **제약 사항**을 직접 비교하고 분석합니다.
 
 ### 🧪 실험 계획
-- [ ] **Static 아키텍처 구현**: static 방식의 로또 프로젝트 대조군 생성
+- [x] **Static 아키텍처 구현**: static 방식의 로또 프로젝트 대조군 생성
 - [ ] **테스트 용이성 비교**: Static vs Singleton 환경에서의 단위 테스트 작성 난이도 및 가능 여부 검증
 - [ ] **동시성 환경 분석**: 멀티스레드 상황에서 각 방식의 동작 차이 및 안정성 확인
   
