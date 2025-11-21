@@ -5,7 +5,7 @@
 
 ## 🎯 프로젝트 개요
 **Spring의 IoC 컨테이너 구조를 직접 구현**하며 **의존성 주입(DI)** 원리를 이해하고,  
-**Static 메서드 기반 접근 방식과 IoC 컨테이너의 Singleton Registry 관리 방식의 차이점 비교**를 통해  
+**Static 메서드 기반 접근 방식**과 **DI 기반 IoC 컨테이너(Singleton Registry) 방식**의 **비교 분석**을 통해  
 적합한 설계에 대한 결론을 도출하기 위한 프로젝트입니다.
 
 ---
@@ -15,9 +15,9 @@
 ```text
 src/main/java
 ├── myframework     → 직접 구현한 IoC 컨테이너
-├── example         → 프레임워크 검증 예제, 실험에서 Singleton을 대표
+├── example         → 프레임워크 검증 예제, 실험에서 DI를 대표
 │   └── lotto       → 로또 미션 이식: Singleton Registry 기반 DI 컨테이너 사용하도록 리팩토링
-└── experiment      → Static vs Singleton 비교 실험
+└── experiment      → Static vs DI 비교 실험
     └── statics     → 실험에서 Static을 대표
         └── lotto   → 로또 미션 이식: Static 메서드 기반 유틸리티 클래스로 리팩토링
 ```
@@ -92,14 +92,16 @@ src/main/java
 ## 🔬 실험
 > **Package:** `experiment`
 
-**Static** 메서드 기반 유틸리티 접근 방식 VS **Singleton** Registry 기반 객체 관리 방식
+**Static** 기반 유틸리티 접근 방식 VS **DI** 기반 IoC 컨테이너(Singleton Registry) 방식
 
-동일한 기능을 수행하는 로또 애플리케이션을 **Static 메서드**와 **Singleton Registry**의 두 가지 방식으로 구현합니다.  
+동일한 기능을 수행하는 로또 애플리케이션을 **Static 메서드**와 **DI 컨테이너**의 두 가지 방식으로 구현합니다.  
 실제 코드를 작성하고 테스트하는 과정에서 발생하는 **구조적 차이**와 **제약 사항**을 직접 비교하고 분석합니다.
 
 ### 🧪 실험 계획
-- [x] **Static 아키텍처 구현**: static 방식의 로또 프로젝트 대조군 생성
-- [ ] **테스트 용이성 비교**: Static vs Singleton 환경에서의 단위 테스트 작성 난이도 및 가능 여부 검증
+- [x] **Static 아키텍처 구현**: Static 방식의 로또 프로젝트 대조군 생성
+- [ ] **테스트 용이성 비교**: **Static** vs **DI** 각 환경에서의 단위 테스트 작성 난이도 및 가능 여부 검증
+  - [ ] Static 환경(`experiment.statics.lotto`): Controller, Service 단위 테스트 작성
+  - [ ] DI 환경(`example.lotto`): Controller, Service 단위 테스트 작성
 - [ ] **동시성 환경 분석**: 멀티스레드 상황에서 각 방식의 동작 차이 및 안정성 확인
   
 📂 상세 실험 보고서는 [`experiments/`](./experiments/) 디렉토리에서 확인하실 수 있습니다.
