@@ -247,7 +247,7 @@ public class ApplicationContext {
             }
         }
         if (candidateBeans.isEmpty()) {
-            throw new BeanCreationException(ErrorMessage.DEPENDENCY_BEAN_NOT_FOUND.getMessage(typeName));
+            throw new DependencyInjectionException(ErrorMessage.DEPENDENCY_BEAN_NOT_FOUND.getMessage(typeName));
         }
         if (candidateBeans.size() > 1) {
             throw new DependencyInjectionException(ErrorMessage.TOO_MANY_DEPENDENCY_BEANS.getMessage(typeName));
