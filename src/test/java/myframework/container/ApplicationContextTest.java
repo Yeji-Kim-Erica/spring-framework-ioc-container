@@ -1,6 +1,7 @@
 package myframework.container;
 
 import myframework.exception.BeanCreationException;
+import myframework.exception.ComponentScanException;
 import myframework.exception.DependencyInjectionException;
 import myframework.exception.NoSuchBeanException;
 import myframework.test.fakepackage.*;
@@ -16,15 +17,15 @@ public class ApplicationContextTest {
     private static final String BASE_PACKAGE = "myframework.test.fakepackage";
     private static final String EXCEPTION_TEST_BASE_PACKAGE = "myframework.test.failpackage";
 
-    private ApplicationContext context;
-
-    @BeforeEach
-    void setUp() {
-        context = new ApplicationContext(BASE_PACKAGE);
-    }
-
     @Nested
     class SuccessTest {
+        private ApplicationContext context;
+
+        @BeforeEach
+        void setUp() {
+            context = new ApplicationContext(BASE_PACKAGE);
+        }
+
         @DisplayName("ApplicationContext 컨테이너가 정상적으로 생성된다")
         @Test
         void returnApplicationContext() {
@@ -74,6 +75,21 @@ public class ApplicationContextTest {
                     .isEqualTo(context.getBean(autowiredComponentName, FakeAutowiredComponent.class));
         }
 
+        @DisplayName("Autowired 어노테이션으로 private 필드에 빈을 주입받는다")
+        @Test
+        void injectBeanFromBeanRegistry_WhenAutowired() {
+            // given
+            String componentName = BASE_PACKAGE + ".FakeComponent";
+            String autowiredComponentName = BASE_PACKAGE + ".FakeAutowiredComponent";
+
+            // when
+            FakeComponent component = context.getBean(componentName, FakeComponent.class);
+
+            // then
+            assertThat(component).extracting("privateAutowiredComponent").isNotNull()
+                    .isEqualTo(context.getBean(autowiredComponentName, FakeAutowiredComponent.class));
+        }
+
         @DisplayName("상속받은 필드에도 빈을 주입받는다")
         @Test
         void injectBeanForInheritedField() {
@@ -119,6 +135,63 @@ public class ApplicationContextTest {
             assertThat(component).extracting("fakeAbstract").isNotNull()
                     .isEqualTo(context.getBean(autowiredComponentName, FakeConcreteComponent.class));
         }
+
+        @DisplayName("Autowired 어노테이션이 붙은 생성자가 존재하면 빈을 주입받는다")
+        @Test
+        void injectBean_WhenAutowiredConstructorExists() {
+            // given
+            String componentName = BASE_PACKAGE + ".FakeComponentWithAutowiredConstructor";
+            String autowiredComponentName = BASE_PACKAGE + ".FakeAutowiredComponent";
+
+            // when
+            Object component = context.getBean(componentName);
+
+            // then
+            assertThat(component).extracting("autowiredComponent").isNotNull()
+                    .isEqualTo(context.getBean(autowiredComponentName, FakeAutowiredComponent.class));
+        }
+
+        @DisplayName("Autowired 어노테이션이 붙은 기본 생성자가 존재할 때도 정상적으로 빈을 등록한다")
+        @Test
+        void registerBean_WhenAutowiredDefaultConstructorExists() {
+            // given
+            String componentName = BASE_PACKAGE + ".FakeComponentWithAutowiredDefaultConstructor";
+
+            // when
+            Object component = context.getBean(componentName);
+
+            // then
+            assertThat(component).isNotNull()
+                    .isInstanceOf(FakeComponentWithAutowiredDefaultConstructor.class);
+        }
+
+        @DisplayName("Autowired 어노테이션이 붙은 생성자의 매개변수에 인터페이스가 있어도 정상적으로 빈을 등록한다")
+        @Test
+        void registerBean_WhenAutowiredConstructorParameterIsInterface() {
+            // given
+            String componentName = BASE_PACKAGE + ".AutowiredConstructorWithInterfaceParameter";
+
+            // when
+            Object component = context.getBean(componentName);
+
+            // then
+            assertThat(component).isNotNull()
+                    .isInstanceOf(AutowiredConstructorWithInterfaceParameter.class);
+        }
+
+        @DisplayName("Autowired 생성자의 매개변수 인터페이스의 구현 클래스에 Autowired 생성자가 있어도 정상적으로 빈을 등록한다")
+        @Test
+        void registerBean_WhenAutowiredConstructorParameterIsInterfaceImplementedWithAutowireConstructor() {
+            // given
+            String componentName = BASE_PACKAGE + ".AutowiredConstructorWithInterfaceWithAutowiredConstructor";
+
+            // when
+            Object component = context.getBean(componentName);
+
+            // then
+            assertThat(component).isNotNull()
+                    .isInstanceOf(AutowiredConstructorWithInterfaceWithAutowiredConstructor.class);
+        }
     }
 
     @Nested
@@ -129,6 +202,7 @@ public class ApplicationContextTest {
             // given
             String nonComponentClassName = BASE_PACKAGE + ".FakeNonComponent";
             String subNonComponentClassName = BASE_PACKAGE + ".fakesubpackage.FakeSubNonComponent";
+            ApplicationContext context = new ApplicationContext(BASE_PACKAGE);
 
             // when & then
             assertThatThrownBy(() -> context.getBean(nonComponentClassName))
@@ -157,8 +231,7 @@ public class ApplicationContextTest {
 
             // when & then
             assertThatThrownBy(() -> new ApplicationContext(errorPackage))
-                    .isInstanceOf(BeanCreationException.class)
-                    .hasCauseInstanceOf(InstantiationException.class);
+                    .isInstanceOf(ComponentScanException.class);
         }
 
         @DisplayName("빈의 이름은 존재하지만 요청한 타입과 다를 경우 예외가 발생한다")
@@ -166,6 +239,7 @@ public class ApplicationContextTest {
         void throwException_WhenTypeMismatch() {
             // given
             String componentName = BASE_PACKAGE + ".FakeComponent";
+            ApplicationContext context = new ApplicationContext(BASE_PACKAGE);
 
             // when & then
             assertThatThrownBy(() -> context.getBean(componentName, String.class))
@@ -173,15 +247,15 @@ public class ApplicationContextTest {
                     .hasMessageContaining("FakeComponent");
         }
 
-        @DisplayName("Autowired 대상인 빈이 존재하지 않으면(Component 누락) 예외가 발생한다")
+        @DisplayName("Autowired 대상인 필드의 빈이 존재하지 않으면(Component 누락) 예외가 발생한다")
         @Test
-        void throwException_WhenAutowiredBeanMissing() {
+        void throwException_WhenAutowiredFieldMissingDependency() {
             // given
-            String errorPackage = "myframework.test.failpackage.missingdependency";
+            String errorPackage = "myframework.test.failpackage.missingdependencyfield";
 
             // when & then
             assertThatThrownBy(() -> new ApplicationContext(errorPackage))
-                    .isInstanceOf(DependencyInjectionException.class);
+                    .isInstanceOf(BeanCreationException.class);
         }
 
         @DisplayName("Autowired로 주입하려는 타입의 빈이 2개 이상 발견되어 유일성이 보장되지 않는 경우 예외가 발생한다")
@@ -189,6 +263,62 @@ public class ApplicationContextTest {
         void throwException_WhenMoreThanOneAutowiredBeansFound() {
             // given
             String errorPackage = EXCEPTION_TEST_BASE_PACKAGE + ".nouniquebean";
+
+            // when & then
+            assertThatThrownBy(() -> new ApplicationContext(errorPackage))
+                    .isInstanceOf(DependencyInjectionException.class);
+        }
+
+        @DisplayName("순환 참조가 발생할 경우 예외가 발생한다")
+        @Test
+        void throwException_WhenCircularDependency() {
+            // given
+            String errorPackage = EXCEPTION_TEST_BASE_PACKAGE + ".circulardependency";
+
+            // when & then
+            assertThatThrownBy(() -> new ApplicationContext(errorPackage))
+                    .isInstanceOf(DependencyInjectionException.class);
+        }
+
+        @DisplayName("생성자가 매개변수로 받은 인터페이스/추상클래스의 구상 클래스가 순환 참조일 경우 예외가 발생한다")
+        @Test
+        void throwException_WhenAutowiredConstructorContainsInterfaceImplementedByCircularDependencyClass() {
+            // given
+            String errorPackage = EXCEPTION_TEST_BASE_PACKAGE + ".interfacecirculardependency";
+
+            // when & then
+            assertThatThrownBy(() -> new ApplicationContext(errorPackage))
+                    .isInstanceOf(DependencyInjectionException.class);
+        }
+
+        @DisplayName("Autowired가 붙은 생성자가 2개 이상 존재할 경우 예외가 발생한다")
+        @Test
+        void throwException_WhenMoreThanOneAutowiredConstructorsFound() {
+            // given
+            String errorPackage = EXCEPTION_TEST_BASE_PACKAGE + ".multiautowiredconstructor";
+
+            // when & then
+            assertThatThrownBy(() -> new ApplicationContext(errorPackage))
+                    .isInstanceOf(DependencyInjectionException.class);
+        }
+
+        @DisplayName("Autowired가 붙은 생성자의 매개변수의 빈이 존재하지 않으면(Component 누락) 예외가 발생한다")
+        @Test
+        void throwException_WhenAutowiredConstructorParameterMissingDependency() {
+            // given
+            String errorPackage = "myframework.test.failpackage.missingdependencyconstructor";
+
+            // when & then
+            assertThatThrownBy(() -> new ApplicationContext(errorPackage))
+                    .isInstanceOf(DependencyInjectionException.class);
+        }
+
+
+        @DisplayName("Autowired가 붙은 생성자의 매개변수가 자기 자신인 경우 예외가 발생한다")
+        @Test
+        void throwException_WhenAutowiredConstructorParameterEqualsSelf() {
+            // given
+            String errorPackage = "myframework.test.failpackage.selfdependency";
 
             // when & then
             assertThatThrownBy(() -> new ApplicationContext(errorPackage))

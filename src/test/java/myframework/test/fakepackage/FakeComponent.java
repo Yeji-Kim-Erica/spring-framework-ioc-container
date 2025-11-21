@@ -7,4 +7,7 @@ import myframework.annotation.Component;
 public class FakeComponent {
     @Autowired
     FakeAutowiredComponent autowiredComponent;
+
+    @Autowired
+    private FakeAutowiredComponent privateAutowiredComponent;
 }

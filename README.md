@@ -35,32 +35,38 @@ src/main/java
         - `Map`을 사용한 **빈 저장소(Singleton Registry)** 구현
     - [x] **컴포넌트 스캔 및 빈 생성**
         - 특정 패키지 하위의 `@Component` 어노테이션이 붙은 클래스 스캔
-        - **(예외 처리)** 패키지 스캔 실패 시 예외 발생
-          - 스캔 중 I/O 오류가 발생할 경우: `ComponentScanException`
-          - 클래스를 찾지 못할 경우: `ComponentScanException`
+        - **(예외 처리)** 패키지 스캔 실패 시 예외 발생: `ComponentScanException`
+          - 스캔 중 I/O 오류가 발생할 경우
+          - 클래스를 찾지 못할 경우
         - Reflection API를 사용해 스캔한 클래스들의 인스턴스 생성
-        - **(예외 처리)** 빈 생성 실패 시 예외 발생
-            - `@Component`로 등록된 클래스에 기본 생성자가 없는 경우: `BeanCreationException`
-            - 추상 클래스 등 인스턴스화가 불가능한 경우: `BeanCreationException`
+        - **(예외 처리)** 빈 생성 실패 시 예외 발생: `BeanCreationException`
+            - `@Component`로 등록된 클래스에 기본 생성자가 없는 경우
+            - 추상 클래스 등 인스턴스화가 불가능한 경우
         - 생성된 인스턴스를 빈 저장소에 등록
 - 의존성 주입 (Dependency Injection)
     - [x] **의존성 주입**
         - 빈 저장소에 등록된 객체들을 순회
         - `@Autowired` 어노테이션이 붙은 필드 식별
         - 빈 저장소에서 해당 필드 타입에 맞는 빈을 **조회**
-        - **(예외 처리)** 주입할 빈을 찾지 못할 경우 예외 발생
-            - [x] `@Component`가 누락된 경우: `DependencyInjectionException`
-            - [x] `@Autowired`로 주입하려는 타입의 빈의 유일성이 보장되지 않는 경우: `DependencyInjectionException`
+        - **(예외 처리)** 주입할 빈을 찾지 못할 경우 예외 발생: `DependencyInjectionException`
+            - [x] `@Component`가 누락된 경우
+            - [x] `@Autowired`로 주입하려는 타입의 빈의 유일성이 보장되지 않는 경우
         - Reflection API를 사용해 필드에 의존 객체를 **주입**
     - [x] **컨테이너의 빈 조회**
         - 컨테이너에 등록된 빈 반환
-        - **(예외 처리)** 빈 저장소에 해당 타입의 빈이 존재하지 않을 경우 예외 발생
-          - 등록되지 않은 클래스의 빈을 얻으려고 할 경우: `NoSuchBeanException`
-          - 빈의 이름은 존재하지만 요청한 타입과 다를 경우: `NoSuchBeanException`
+        - **(예외 처리)** 빈 저장소에 해당 타입의 빈이 존재하지 않을 경우 예외 발생: `NoSuchBeanException`
+          - 등록되지 않은 클래스의 빈을 얻으려고 할 경우
+          - 빈의 이름은 존재하지만 요청한 타입과 다를 경우
 
 ### 3. (선택 과제) 기능 추가
-- [ ] 생성자 주입 방식 지원
-    - **(예외 처리)** 순환 참조 발생 시 예외 발생
+- [x] **생성자 주입 방식 지원**
+    - `@Autowired`가 붙은 생성자를 통한 의존성 주입 우선 처리
+    - 생성자 파라미터로 인터페이스/추상클래스가 올 경우 구현체를 재귀적으로 탐색하여 주입
+    - **(예외 처리)** 생성자 주입 실패 시 예외 발생: `DependencyInjectionException`
+      - `@Autowired` 생성자가 2개 이상 존재하는 경우
+      - 주입할 파라미터 타입의 빈이 존재하지 않는 경우
+      - 생성자 간의 직접/간접 순환 참조가 발생하는 경우
+      - 자기 자신을 의존하는 경우
 
 ---
 
