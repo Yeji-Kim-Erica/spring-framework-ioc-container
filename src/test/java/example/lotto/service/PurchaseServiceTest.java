@@ -21,14 +21,14 @@ public class PurchaseServiceTest {
 
     @BeforeEach
     void setUp() {
-        purchaseService = new PurchaseService();
+
         LottoNumberGenerator lottoNumberGenerator = new LottoNumberGenerator() {
             @Override
             public List<Integer> generateUniqueNumbersInRange() {
                 return List.of(1,2,3,4,5,6);
             }
         };
-        TestUtils.inject(purchaseService, "lottoNumberGenerator", lottoNumberGenerator);
+        purchaseService = new PurchaseService(lottoNumberGenerator);
     }
 
     @Nested

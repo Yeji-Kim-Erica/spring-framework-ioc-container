@@ -17,8 +17,12 @@ import java.util.List;
 public class PurchaseService {
     private static int LOTTO_PRICE = 1000;
 
+    private final LottoNumberGenerator lottoNumberGenerator;
+
     @Autowired
-    private LottoNumberGenerator lottoNumberGenerator;
+    public PurchaseService(LottoNumberGenerator lottoNumberGenerator) {
+        this.lottoNumberGenerator = lottoNumberGenerator;
+    }
 
     public DepositAmount depositMoney(String amount) {
         return DepositAmount.from(amount);

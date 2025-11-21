@@ -18,7 +18,6 @@ public class DepositAmount {
     private DepositAmount(int amount) {
         validateDepositAmountRule(amount);
         this.amount = amount;
-
     }
 
     public static DepositAmount from(String depositAmount) {
