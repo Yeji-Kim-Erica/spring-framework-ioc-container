@@ -13,10 +13,14 @@ import myframework.annotation.Component;
  */
 @Component
 public class LottoController {
+    private final PurchaseService purchaseService;
+    private final DrawService drawService;
+
     @Autowired
-    private PurchaseService purchaseService;
-    @Autowired
-    private DrawService drawService;
+    public LottoController(PurchaseService purchaseService, DrawService drawService) {
+        this.purchaseService = purchaseService;
+        this.drawService = drawService;
+    }
 
     public void run() {
         DepositAmount depositAmount = makeDeposit();
