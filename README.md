@@ -101,7 +101,7 @@ src/main/java
 - [x] **Static 아키텍처 구현**: Static 방식의 로또 프로젝트 대조군 생성
 - [ ] **테스트 용이성 비교**: **Static** vs **DI** 각 환경에서의 단위 테스트 작성 난이도 및 가능 여부 검증
   - [ ] Static 환경(`experiment.statics.lotto`): Controller, Service 단위 테스트 작성
-  - [ ] DI 환경(`example.lotto`): Controller, Service 단위 테스트 작성
+  - [x] DI 환경(`example.lotto`): Controller, Service 단위 테스트 작성
 - [ ] **동시성 환경 분석**: 멀티스레드 상황에서 각 방식의 동작 차이 및 안정성 확인
   
 📂 상세 실험 보고서는 [`experiments/`](./experiments/) 디렉토리에서 확인하실 수 있습니다.
