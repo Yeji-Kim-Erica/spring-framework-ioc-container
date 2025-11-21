@@ -50,14 +50,14 @@ public class ApplicationContext {
 
     private Set<Class<?>> scanCandidateComponentsAndInstantiate() {
         Set<String> classNames = getClassNamesFromPackage(BASE_PACKAGE);
-        Set<Class<?>> initiatedComponents = new HashSet<>();
+        Set<Class<?>> annotatedComponents = new HashSet<>();
         for (String className : classNames) {
             Class<?> clazz = putBeanIfAnnotatedAsComponent(className);
             if (clazz != null) {
-                initiatedComponents.add(clazz);
+                annotatedComponents.add(clazz);
             }
         }
-        return initiatedComponents;
+        return annotatedComponents;
     }
 
     private Set<String> getClassNamesFromPackage(String basePackage) {
@@ -227,7 +227,7 @@ public class ApplicationContext {
         if (instance != null) {
             return instance;
         }
-        return injectDependenciesIfAnnotatedAsAutowired(targetClazz);
+        return injectDependenciesIfAnnotatedAsAutowired(concreteClass);
     }
 
     private Class<?> findConcreteClass(Class<?> targetClazz) {
@@ -322,15 +322,11 @@ public class ApplicationContext {
 
     private Object getParameterInstance(Class<?> parameterType) {
         String typeName = parameterType.getName();
-        try {
-            return beans.get(typeName);
-        } catch (BeanCreationException e) {
-            Object parameterInstance = initiateAndRegisterComponentWithConstructor(parameterType);
-            if (parameterInstance == null) {
-                throw new DependencyInjectionException(ErrorMessage.DEPENDENCY_INJECTION_FAILED.getMessage(typeName));
-            }
-            return parameterInstance;
+        Object parameterInstance = beans.get(typeName);
+        while (parameterInstance == null) {
+            parameterInstance = initiateAndRegisterComponentWithConstructor(parameterType);
         }
+        return parameterInstance;
     }
 
     private void injectDependenciesByFields() {
