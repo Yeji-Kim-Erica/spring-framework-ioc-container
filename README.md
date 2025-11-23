@@ -104,6 +104,7 @@ src/main/java
   - [x] DI 환경(`example.lotto`): Controller, Service 단위 테스트 작성
 - [x] **동시성 환경 분석**: 멀티스레드 상황에서 각 방식의 동작 차이 및 안정성 확인
   - [x] Static 환경(`experiment.statics.lotto`): 멀티스레드에서의 Controller 동작 테스트 작성
+    - 입출력
   - [x] DI 환경(`example.lotto`): 멀티스레드에서의 Controller 동작 테스트 작성
   
 📂 상세 실험 보고서는 [`experiments/`](./experiments/) 디렉토리에서 확인하실 수 있습니다.
