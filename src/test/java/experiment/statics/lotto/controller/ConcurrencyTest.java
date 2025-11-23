@@ -50,7 +50,7 @@ public class ConcurrencyTest {
 
                 System.setIn(new ByteArrayInputStream(inputs.get(finalJ).getBytes()));
 
-                try {
+                 try {
                     LottoController.run();
 
                     String result = output.toString();
@@ -88,6 +88,47 @@ public class ConcurrencyTest {
         assertThat(successCount).isEqualTo(0);
         assertThat(runErrorCount).isEqualTo(threadCount);
         assertThat(dataCorruptionCount).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("Static 방식: 동기화된 채로 100명이 동시에 로또 게임을 하면 걸리는 시간을 측정한다")
+    void static_MultiThread_Synchronized_TimeTaken() {
+        // given
+        int threadCount = 100;
+        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
+
+        // when
+        long start = System.currentTimeMillis();
+
+        for (int i = 0; i < threadCount; i++) {
+            int finalJ = i % 6;
+            futures.add(CompletableFuture.runAsync(() -> {
+                synchronized (SynchronizedLottoController.class) {
+                    Console.close();
+                    ByteArrayOutputStream output = new ByteArrayOutputStream();
+                    System.setOut(new PrintStream(output));
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException();
+                    }
+                    System.setIn(new ByteArrayInputStream(inputs.get(finalJ).getBytes()));
+
+                    SynchronizedLottoController.run();
+
+                    String result = output.toString();
+                    assertThat(result).contains(String.format("%d개를 구매했습니다.", expected.get(finalJ)));
+                }
+            }, executor));
+        }
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+
+        long end = System.currentTimeMillis();
+
+        // then
+        double timeTaken = (end - start) / 1000.0;
+        System.err.printf("===== Static Synchronized 총 소요 시간: %.3f초 =====", timeTaken);
     }
 
     @Test
@@ -154,46 +195,5 @@ public class ConcurrencyTest {
 
         // then
         assertThat(timeTakenOnMultiThread).isGreaterThan(timeTakenOnSingleThread);
-    }
-
-    @Test
-    @DisplayName("Static 방식: 동기화된 채로 100명이 동시에 로또 게임을 하면 걸리는 시간을 측정한다")
-    void static_MultiThread_Synchronized_TimeTaken() {
-        // given
-        int threadCount = 100;
-        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-        List<CompletableFuture<Void>> futures = new ArrayList<>();
-
-        // when
-        long start = System.currentTimeMillis();
-
-        for (int i = 0; i < threadCount; i++) {
-            int finalJ = i % 6;
-            futures.add(CompletableFuture.runAsync(() -> {
-                synchronized (SynchronizedLottoController.class) {
-                    Console.close();
-                    ByteArrayOutputStream output = new ByteArrayOutputStream();
-                    System.setOut(new PrintStream(output));
-                    try {
-                        Thread.sleep(300);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException();
-                    }
-                    System.setIn(new ByteArrayInputStream(inputs.get(finalJ).getBytes()));
-
-                    SynchronizedLottoController.run();
-
-                    String result = output.toString();
-                    assertThat(result).contains(String.format("%d개를 구매했습니다.", expected.get(finalJ)));
-                }
-            }, executor));
-        }
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-
-        long end = System.currentTimeMillis();
-
-        // then
-        double timeTaken = (end - start) / 1000.0;
-        System.err.printf("===== Static Synchronized 총 소요 시간: %.3f초 =====", timeTaken);
     }
 }
