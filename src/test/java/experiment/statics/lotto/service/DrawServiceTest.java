@@ -1,7 +1,6 @@
-package example.lotto.service;
+package experiment.statics.lotto.service;
 
-import example.lotto.domain.*;
-import org.junit.jupiter.api.BeforeEach;
+import experiment.statics.lotto.domain.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,13 +13,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class DrawServiceTest {
-    private DrawService drawService;
-
-    @BeforeEach
-    void setUp() {
-        drawService = new DrawService();
-    }
-
     @Nested
     class SuccessTest {
         @DisplayName("유효한 당첨 번호 입력 시 입력한 값을 당첨 번호로 가지는 WinningNumbers 객체를 생성한다.")
@@ -30,7 +22,7 @@ public class DrawServiceTest {
             String input = "1,2,3,4,5,6";
 
             // when
-            WinningNumbers result = drawService.determineWinningNumbers(input);
+            WinningNumbers result = DrawService.determineWinningNumbers(input);
 
             // then
             assertThat(result.countMatchingNumbers(List.of(1,2,3,4,5,6))).isEqualTo(6);
@@ -44,7 +36,7 @@ public class DrawServiceTest {
             WinningNumbers winningNumbers = WinningNumbers.from("1,2,3,4,5,6");
 
             // when
-            BonusNumber result = drawService.determineBonusNumber(input, winningNumbers);
+            BonusNumber result = DrawService.determineBonusNumber(input, winningNumbers);
 
             // then
             assertThat(result.hasMatchingNumber(List.of(7))).isTrue();
@@ -64,7 +56,7 @@ public class DrawServiceTest {
             BonusNumber bonusNumber = BonusNumber.of("7", winningNumbers);
 
             // when
-            Prizes prizes = drawService.checkLotteryResult(lottos, winningNumbers, bonusNumber);
+            Prizes prizes = DrawService.checkLotteryResult(lottos, winningNumbers, bonusNumber);
 
             // then
             assertThat(prizes.getPrizesCount(Prize.FIRST_PRIZE)).isEqualTo(1);
@@ -85,7 +77,7 @@ public class DrawServiceTest {
             );
 
             // when & then
-            assertThat(drawService.calculateProfitRate(depositAmount, prizes))
+            assertThat(DrawService.calculateProfitRate(depositAmount, prizes))
                     .isEqualTo(62.5);
         }
     }
@@ -97,7 +89,7 @@ public class DrawServiceTest {
         @ValueSource(strings = {"1,2,3,4,5,5", "당첨번호"})
         void should_ThrowException_WhenInvalidWinningNumbersEntered(String input) {
             // when & then
-            assertThatThrownBy(() -> drawService.determineWinningNumbers(input))
+            assertThatThrownBy(() -> DrawService.determineWinningNumbers(input))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -109,7 +101,7 @@ public class DrawServiceTest {
             WinningNumbers winningNumbers = WinningNumbers.from("1,2,3,4,5,6");
 
             // when & then
-            assertThatThrownBy(() -> drawService.determineBonusNumber(input, winningNumbers))
+            assertThatThrownBy(() -> DrawService.determineBonusNumber(input, winningNumbers))
                     .isInstanceOf(IllegalArgumentException.class);
         }
     }

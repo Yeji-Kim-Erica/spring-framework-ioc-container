@@ -1,10 +1,7 @@
-package example.lotto.service;
+package experiment.statics.lotto.service;
 
-import example.lotto.domain.DepositAmount;
-import example.lotto.domain.Lottos;
-import example.lotto.util.LottoNumberGenerator;
-import example.lotto.util.RandomLottoNumberGenerator;
-import org.junit.jupiter.api.BeforeEach;
+import experiment.statics.lotto.domain.DepositAmount;
+import experiment.statics.lotto.domain.Lottos;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,14 +12,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class PurchaseServiceTest {
-    private PurchaseService purchaseService;
-
-    @BeforeEach
-    void setUp() {
-        LottoNumberGenerator lottoNumberGenerator = new RandomLottoNumberGenerator();
-        purchaseService = new PurchaseService(lottoNumberGenerator);
-    }
-
     @Nested
     class SuccessTest {
         @DisplayName("유효한 금액 입력 시 입력한 금액만큼을 잔고로 가진 DepositAmount 객체를 생성한다.")
@@ -30,7 +19,7 @@ public class PurchaseServiceTest {
         @CsvSource(value = {"5000, 1000, 5", "10000, 1000, 10", "3000, 3000, 1"})
         void should_CreateDepositAmountOfCorrectDeposit(String input, int lottoPrice, int expected) {
             // when
-            DepositAmount result = purchaseService.depositMoney(input);
+            DepositAmount result = PurchaseService.depositMoney(input);
 
             // then
             assertThat(result).isNotNull();
@@ -45,7 +34,7 @@ public class PurchaseServiceTest {
             DepositAmount amount = DepositAmount.from(input);
 
             // when
-            Lottos result = purchaseService.purchaseLottos(amount);
+            Lottos result = PurchaseService.purchaseLottos(amount);
 
             // then
             assertThat(result.size()).isEqualTo(expected);
@@ -59,7 +48,7 @@ public class PurchaseServiceTest {
         @ValueSource(strings = {"2500", "1000원"})
         void should_ThrowException_WhenWrongDepositOccurs(String input) {
             // when & then
-            assertThatThrownBy(() -> purchaseService.depositMoney(input))
+            assertThatThrownBy(() -> PurchaseService.depositMoney(input))
                     .isInstanceOf(IllegalArgumentException.class);
         }
     }

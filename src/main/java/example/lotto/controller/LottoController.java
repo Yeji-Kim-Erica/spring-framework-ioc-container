@@ -13,13 +13,18 @@ import myframework.annotation.Component;
  */
 @Component
 public class LottoController {
+    private final InputView inputView;
+    private final OutputView outputView;
     private final PurchaseService purchaseService;
     private final DrawService drawService;
 
     @Autowired
-    public LottoController(PurchaseService purchaseService, DrawService drawService) {
+    public LottoController(PurchaseService purchaseService, DrawService drawService,
+                           InputView inputView, OutputView outputView) {
         this.purchaseService = purchaseService;
         this.drawService = drawService;
+        this.inputView = inputView;
+        this.outputView = outputView;
     }
 
     public void run() {
@@ -36,20 +41,20 @@ public class LottoController {
             try {
                 return attemptDeposit();
             } catch (IllegalArgumentException e) {
-                OutputView.printErrorMessage(e);
+                outputView.printErrorMessage(e);
             }
         }
     }
 
     private DepositAmount attemptDeposit() {
-        OutputView.printDepositPrompt();
-        String depositAmount = InputView.readDepositAmount();
+        outputView.printDepositPrompt();
+        String depositAmount = inputView.readDepositAmount();
         return purchaseService.depositMoney(depositAmount);
     }
 
     private Lottos buyLottosAndPrintIssuanceDetails(DepositAmount depositAmount) {
         Lottos lottos = purchaseService.purchaseLottos(depositAmount);
-        OutputView.printLottoIssuanceDetails(lottos);
+        outputView.printLottoIssuanceDetails(lottos);
         return lottos;
     }
 
@@ -58,42 +63,42 @@ public class LottoController {
             try {
                 return attemptSelectingWinningNumbers();
             } catch (IllegalArgumentException e) {
-                OutputView.printErrorMessage(e);
+                outputView.printErrorMessage(e);
             }
         }
     }
 
     private WinningNumbers attemptSelectingWinningNumbers() {
-        OutputView.printWinningNumberPrompt();
-        String winningNumbers = InputView.readWinningNumbers();
+        outputView.printWinningNumberPrompt();
+        String winningNumbers = inputView.readWinningNumbers();
         return drawService.determineWinningNumbers(winningNumbers);
     }
 
     private BonusNumber drawBonusNumber(WinningNumbers winningNumbers) {
-        OutputView.printBlankLine();
+        outputView.printBlankLine();
         while (true) {
             try {
                 return attemptSelectingBonusNumber(winningNumbers);
             } catch (IllegalArgumentException e) {
-                OutputView.printErrorMessage(e);
+                outputView.printErrorMessage(e);
             }
         }
     }
 
     private BonusNumber attemptSelectingBonusNumber(WinningNumbers winningNumbers) {
-        OutputView.printBonusNumberPrompt();
-        String bonusNumber = InputView.readBonusNumber();
+        outputView.printBonusNumberPrompt();
+        String bonusNumber = inputView.readBonusNumber();
         return drawService.determineBonusNumber(bonusNumber, winningNumbers);
     }
 
     private Prizes drawPrizesAndPrintResult(Lottos lottos, WinningNumbers winningNumbers, BonusNumber bonusNumber) {
         Prizes prizes = drawService.checkLotteryResult(lottos, winningNumbers, bonusNumber);
-        OutputView.printWinningResults(prizes);
+        outputView.printWinningResults(prizes);
         return prizes;
     }
 
     private void analyzeProfitAndPrintResult(DepositAmount depositAmount, Prizes prizes) {
         double profitRate = drawService.calculateProfitRate(depositAmount, prizes);
-        OutputView.printProfitRate(profitRate);
+        outputView.printProfitRate(profitRate);
     }
 }

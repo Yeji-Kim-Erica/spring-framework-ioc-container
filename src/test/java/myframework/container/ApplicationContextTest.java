@@ -255,7 +255,7 @@ public class ApplicationContextTest {
 
             // when & then
             assertThatThrownBy(() -> new ApplicationContext(errorPackage))
-                    .isInstanceOf(BeanCreationException.class);
+                    .isInstanceOf(DependencyInjectionException.class);
         }
 
         @DisplayName("Autowired로 주입하려는 타입의 빈이 2개 이상 발견되어 유일성이 보장되지 않는 경우 예외가 발생한다")
