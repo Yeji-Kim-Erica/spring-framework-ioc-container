@@ -10,7 +10,7 @@
 
 ---
 
-## 🗂️ 프로젝트 구조
+## 🗂️ 프로젝트 패키지 구조
 이 프로젝트는 **프레임워크 구현체**와 **실제 사용 예시**, **비교 실험**을 패키지로 분리하여 구성했습니다.  
 ```text
 src/main/java
@@ -97,14 +97,19 @@ src/main/java
 동일한 기능을 수행하는 로또 애플리케이션을 **Static 메서드**와 **DI 컨테이너**의 두 가지 방식으로 구현합니다.  
 실제 코드를 작성하고 테스트하는 과정에서 발생하는 **구조적 차이**와 **제약 사항**을 직접 비교하고 분석합니다.
 
-### 🧪 실험 계획
+### 🧪 실험 수행 및 검증 결과
 - [x] **Static 아키텍처 구현**: Static 방식의 로또 프로젝트 대조군 생성
 - [x] **테스트 용이성 비교**: **Static** vs **DI** 각 환경에서의 단위 테스트 작성 난이도 및 가능 여부 검증
-  - [x] Static 환경(`experiment.statics.lotto`): Controller, Service 단위 테스트 작성
-  - [x] DI 환경(`example.lotto`): Controller, Service 단위 테스트 작성
+  - [x] Static 환경(`experiment.statics.lotto`): Controller, Service 단위 테스트
+    - **검증 한계**: 내부 의존성(`RandomLottoNumberGenerator`) 제어 불가로 인해 정확한 결과는 예측 불가, 흐름 확인 정도만 가능
+    - **환경 종속**: `System.in/out`과 같은 전역 입출력 자원을 직접 조작하는 코드를 작성해야 했음
+  - [x] DI 환경(`example.lotto`): Controller, Service 단위 테스트
+    - **검증 성공**: 생성자 주입을 통해 가짜 로또 번호 생성기를 주입해, 원하는 시나리오에 대한 테스트가 자유롭게 구현 가능함을 확인
 - [x] **동시성 환경 분석**: 멀티스레드 상황에서 각 방식의 동작 차이 및 안정성 확인
-  - [x] Static 환경(`experiment.statics.lotto`): 멀티스레드에서의 Controller 동작 테스트 작성
-    - 입출력
-  - [x] DI 환경(`example.lotto`): 멀티스레드에서의 Controller 동작 테스트 작성
+  - [x] Static 환경(`experiment.statics.lotto`): 멀티스레드에서의 Controller 동작 테스트
+    - **동기화 미적용**(`LottoController`): 전역 자원 경합으로 인한 실행 오류 발생 확인
+    - **동기화 적용**(`SynchronizedLottoController`): `synchronized`로 데이터 무결성은 확보되나, 전역 Lock으로 인한 심각한 성능 저하 확인
+  - [x] DI 환경(`example.lotto`): 멀티스레드에서의 Controller 동작 테스트
+    - **성능 우수성**: 입출력 객체의 인스턴스 격리(테스트용 가짜 입출력 객체 주입)를 통한 데이터 무결성 및 병렬 처리 성능 검증
   
 📂 상세 실험 보고서는 [`experiments/`](./experiments/) 디렉토리에서 확인하실 수 있습니다.
