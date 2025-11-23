@@ -112,4 +112,4 @@ src/main/java
   - [x] DI 환경(`example.lotto`): 멀티스레드에서의 Controller 동작 테스트
     - **성능 우수성**: 입출력 객체의 인스턴스 격리(테스트용 가짜 입출력 객체 주입)를 통한 데이터 무결성 및 병렬 처리 성능 검증
   
-📂 상세 실험 보고서는 [`experiments/`](./experiments/) 디렉토리에서 확인하실 수 있습니다.
+📊 상세한 내용은 [**실험 보고서**](./experiments/report.md)에서 확인하실 수 있습니다.
