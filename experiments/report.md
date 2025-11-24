@@ -69,6 +69,7 @@ public class PurchaseService {
 - **현상**: 여러 스레드가 `System.in`을 동시에 점유하려다 입력 스트림이 꼬이거나 닫힘.
 - **결과**: `NoSuchElementException`이 발생하며 **100% 실행 오류. 가용성 0%.**
     <img src="./images/Static_Unsynchronized_MultiThread_Crash_Log.png" width="600" alt="동기화되지 않은 Static 멀티스레드 실행 오류">
+    <br>
 
 ### 4-2. 2차 시도: 동기화 적용 → 병목 현상 발생
 - **조치**: `Controller.run()` 메서드 전체에 `synchronized` 키워드 적용.
@@ -76,10 +77,12 @@ public class PurchaseService {
 - **시간 측정 결과 (100명 기준, 입력 지연 0.3초로 가정):**
     - **Static (Synchronized):** 약 **31.335초** 소요. → 사실상 단일 스레드
         <img src="./images/Static_Synchronized_MultiThread_TimeTaken.png" width="600" alt="동기화된 Static 멀티스레드 작업 소요 시간">
+        <br>
     - **DI (Singleton):** 약 **0.426초** 소요. → 완벽한 병렬 처리
         <img src="./images/DI_MultiThread_TimeTaken.png" width="600" alt="DI 멀티스레드 작업 소요 시간">
+        <br>
 
-### 추가 검증: Static 구조에서 싱글 스레드 vs 동기화된 멀티스레드
+### 4-3. 심화 분석: 동기화의 역설 (싱글 스레드보다 느린 멀티스레드)
 - "과연 Static 구조에서 동기화된 멀티스레드가 싱글 스레드와 얼마나 다를까?"를 확인하기 위해 수행 시간을 비교했습니다.
 ```java
 // 결과: 멀티스레드임에도 불구하고 락 대기 시간 + 스레드 생성 비용으로 인해 더 느려짐
@@ -99,5 +102,6 @@ assertThat(timeTakenOnMultiThread).isGreaterThan(timeTakenOnSingleThread);
 1.  **테스트 용이성:** DI는 코드를 **테스트 가능한 상태**로 유지해 주며, 이는 소프트웨어의 품질과 직결됩니다.
 2.  **확장성과 안정성:** Static 구조는 간단한 일회용 스크립트에는 적합할지 몰라도, **변화하는 요구사항**과 **멀티스레드 환경**을 견뎌야 하는 엔터프라이즈 애플리케이션에는 부적합합니다.
 
-직접 구현한 DI 컨테이너는 단순한 기술적 모방이 아니라, **좋은 소프트웨어 설계를 위한 필수적인 기반**임을 확인했습니다.  
-또한 **IoC**로 객체의 생성과 의존성 연결을 프레임워크에 위임함으로써 **비즈니스 로직에만 집중**하며 기존의 로또 프로젝트를 리팩토링하는 경험을 통해 프레임워크의 필요성을 더욱 잘 이해할 수 있었습니다.
+> 직접 구현한 DI 컨테이너는 단순한 기술적 모방이 아니라, **좋은 소프트웨어 설계를 위한 필수적인 기반**임을 확인했습니다.  
+> 또한 **IoC**로 객체의 생성과 의존성 연결을 프레임워크에 위임함으로써, 개발자는 **비즈니스 로직에만 집중**할 수 있게 되었습니다.  
+> 기존의 로또 프로젝트를 리팩토링하는 과정은 이러한 프레임워크의 효용성을 몸소 체감하는 소중한 경험이었습니다."  
